@@ -45,13 +45,11 @@ By default, a new user belongs to the `public` role and has no privileges other 
 
 The `root` user is created by default for each cluster. The `root` user is assigned to the [`admin` role](#admin-role) and has all privileges across the cluster.
 
-For secure clusters, in addition to [generating the client certificate](../authentication.html#client-authentication) for the `root` user, you can assign or change the password for the `root` user using the [`ALTER USER`](alter-user.html) statement.
+For secure clusters, in addition to [generating the client certificate](authentication.html#client-authentication) for the `root` user, you can assign or change the password for the `root` user using the [`ALTER USER`](../alter-user.html) statement.
 
 ## Roles
 
 A role is a group of users and/or other roles for which you can grant or revoke privileges as a whole. To simplify access management, create a role and grant privileges to the role, then create SQL users and grant them membership to the role.
-
-
 
 
 
@@ -144,7 +142,7 @@ To view the default privileges for a role, or for a set of roles, use the [`SHOW
 
 To change the default privileges on objects that a user creates, use the [`ALTER DEFAULT PRIVILEGES`](alter-default-privileges.html) statement.
 
-The creator of an object is also the object's [owner](authorization.html#object-ownership). Any roles that are members of the owner role have `ALL` privileges on the object, independent of the default privileges. Altering the default privileges of objects created by a role does not affect that role's privileges as the object's owner. The default privileges granted to other users/roles are always in addition to the ownership (i.e., `ALL`) privileges given to the creator of the object.
+The creator of an object is also the object's [owner](security-reference/authorization.html#object-ownership). Any roles that are members of the owner role have `ALL` privileges on the object, independent of the default privileges. Altering the default privileges of objects created by a role does not affect that role's privileges as the object's owner. The default privileges granted to other users/roles are always in addition to the ownership (i.e., `ALL`) privileges given to the creator of the object.
 
 For more examples of default privileges, see the examples on the [`SHOW DEFAULT PRIVILEGES`](../show-default-privileges.html#examples) and [`ALTER DEFAULT PRIVILEGES`](../alter-default-privileges.html#examples) statement pages.
 

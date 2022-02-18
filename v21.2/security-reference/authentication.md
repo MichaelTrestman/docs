@@ -91,7 +91,7 @@ This is convenient for quick usage and experimentation, but is not suitable for 
 
 CockroachDB Dedicated Cloud clusters enforce IP allow-listing, which can be configured through the Web Console.
 
-See [Managing Network Authorization for CockroachDB Dedicated](../cockroachcloud/network-authorization.html).
+See [Managing Network Authorization for CockroachDB Dedicated](../../cockroachcloud/network-authorization.html).
 
 ### Self-Hosted
 

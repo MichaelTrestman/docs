@@ -4,10 +4,7 @@ summary: An overview of CockroachDB Security Features
 toc: true
 docs_area: reference.security
 ---
-
-
-
-## Comparison of security features in CockroachDB product offerings
+## Product Definitions
 
 ### Cloud Products
 
@@ -28,6 +25,8 @@ Cockroach Labs maintains <a href="https://github.com/cockroachdb/cockroach">Cock
 - See the [list of Enterprise features](../enterprise-licensing.html)
 - Read the [licensing FAQ](../licensing-faqs.html)
 - [Contact our sales team](mailto:sales@cockroachlabs.com) for further questions about CockroachDB Enterprise
+
+## Comparison of security features in CockroachDB product offerings
 
 <table>
   <tr>

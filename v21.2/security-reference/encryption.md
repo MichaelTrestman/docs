@@ -12,6 +12,13 @@ Data encryption and decryption is the process of transforming plaintext data to 
 
 CockroachDB uses either TLS 1.2 or TLS 1.3 for inter-node and client-node [authentication](authentication.html) as well as setting up a secure communication channel. Once the secure channel is set up, all inter-node and client-node network communication is encrypted using a [shared encryption key](https://en.wikipedia.org/wiki/Transport_Layer_Security) as per the TLS 1.2 protocol. This feature is enabled by default for all secure clusters and needs no additional configuration.
 
+## CockroachDB Encryption at Rest in Cloud Offerings
+
+All data on CockroachDB Cloud is encrypted-at-rest using the tools provided by the cloud provider that your cluster is running in (i.e.,  for  and <a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EBSEncryption.html">EBS encryption-at-rest</a> for AWS). 
+
+
+Because we are relying on the cloud provider's encryption implementation, we do not enable CockroachDB's <a href="../{{site.versions["stable"]}}/encryption.html#encryption-at-rest-enterprise">internal implementation of encryption-at-rest</a>. This means that encryption will appear to be disabled in the <a href="../{{site.versions["stable"]}}/ui-overview.html">DB Console</a>, since it is unaware of cloud provider encryption.</td>
+
 ## Encryption at rest (Enterprise)
 
 Encryption at Rest provides transparent encryption of a node's data on the local disk. It allows encryption of all files on disk using [AES](https://en.wikipedia.org/wiki/Advanced_Encryption_Standard) in [counter mode](https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation#Counter_(CTR)), with all key

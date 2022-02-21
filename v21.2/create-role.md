@@ -5,7 +5,7 @@ toc: true
 docs_area: reference.sql
 ---
 
-The `CREATE ROLE` [statement](sql-statements.html) creates SQL [roles](security-reference/authorization.html#create-and-manage-roles), which are groups containing any number of roles and users as members. You can assign [privileges](security-reference/authorization.html#privileges) to roles, and all members of the role (regardless of whether if they are direct or indirect members) will inherit the role's privileges.
+The `CREATE ROLE` [statement](sql-statements.html) creates SQL [roles](security-reference/authorization.html#users-and-roles), which are groups containing any number of roles and users as members. You can assign [privileges](security-reference/authorization.html#privileges) to roles, and all members of the role (regardless of whether if they are direct or indirect members) will inherit the role's privileges.
 
 {% include {{ page.version.version }}/misc/schema-change-stmt-note.md %}
 

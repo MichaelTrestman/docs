@@ -277,7 +277,7 @@ All possible `PRIVILEGE` event types are detailed in the [reference documentatio
 
 ### USER_ADMIN
 
-The [`USER_ADMIN`](logging.html#user_admin) channel logs changes to users and roles. This includes user and role [creation and assignment](security-reference/authorization.html#create-and-manage-roles) and changes to [privileges](security-reference/authorization.html#managing-privileges), [options](create-role.html#parameters), and [passwords](authentication.html#client-authentication).
+The [`USER_ADMIN`](logging.html#user_admin) channel logs changes to users and roles. This includes user and role [creation and assignment](security-reference/authorization.html#create-and-manage-users) and changes to [privileges](security-reference/authorization.html#managing-privileges), [options](create-role.html#parameters), and [passwords](authentication.html#client-authentication).
 
 #### Example: SQL user creation
 

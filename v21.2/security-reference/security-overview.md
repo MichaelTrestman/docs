@@ -10,7 +10,7 @@ docs_area: reference.security
 
 <b>CockroachDB Serverless</b> (beta) provides fast and easy access (including a *free* tier) to CockroachDB as a web service, hosted by Cockroach Labs. Clusters run in multi-tenant Google Cloud Platform (GCP) or Amazon Web Services (AWS) environments with shared compute and networking resources.
 
-<b>CockroachDB Dedicated</b> offers a single-tenant cluster running in its own Virtual Private Cloud (VPC). Compute and networking resources are isolated. Additional features such as SSO and SQL audit logging are available.
+<b>CockroachDB Dedicated</b> offers a single-tenant cluster running in its own Virtual Private Cloud (VPC). Compute and networking resources are isolated. Additional security-enhancing features such as single-sign on (SSO) and SQL audit logging are available.
 
 [Sign up for a CockroachDB Cloud account!](https://www.cockroachlabs.com/get-started-cockroachdb/)
 
@@ -165,6 +165,9 @@ Cockroach Labs maintains <a href="https://github.com/cockroachdb/cockroach">Cock
 </table>
 
 !!! Fact check HTTP API access using loging tokens for self-and self-w-ent; self you could surely do this yourself; it's not a feature we offer but our tool is certainly compatible with it Same with VPC Peering. But... further question, for ent *is* it a feature, like will we do it for you?
+
+!!! what about sql audit logging, copy above implies not available in serverless
+
 
 ## Understanding database security
 

@@ -8,62 +8,99 @@ jobs:
     if: github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 2
 
-      - name: Get changed files
-        id: changed_files
-        uses: tj-actions/changed-files@v4.2
-
       - name: Format list of changed files
         id: format
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           declare -a output
-
-          files=(${{ steps.changed_files.outputs.all_modified_files }})
           pr_num=${{ github.event.pull_request.number }}
+
+          files=`gh pr view ${pr_num} --json files -q '.files[].path'`
+              
+          SAVEIFS=$IFS
+          IFS=$'\n'
+          files=($files)
+          IFS=$SAVEIFS 
+
+          function generateMainFiles() {
+            html_file=`echo "${1%.md}.html" | sed -E 's/src\/[^\/]*\///g'`
+            file="<li><a href=\"https://deploy-preview-$pr_num--cockroachdb-docs.netlify.app/docs/$html_file\" target=\"_blank\" rel=\"noopener\">$1</a></li>"
+            output+="$file"
+          }
+
+          function generateIncludes() {
+            output+="<li>$1:</li><ul>"
+            OLDIFS=$IFS
+            IFS='/'
+            read -ra path <<< "$1"
+            IFS=$OLDIFS
+            if [[ $1 == src/*/_includes* ]]
+            then
+              major_version=${path[3]}
+            elif $1 == src/*/v* || $1 == src/*/cockroachcloud*
+            then
+              major_version=${path[2]}
+            fi
+            file_name=${path[-1]}
+            mainRefs=($(grep -irl /${file_name} src/*/${major_version} | sed -e 's/^\.\///g'))
+            includeRefs=($(grep -irl /${file_name} src/*/_includes/${major_version} | sed -e 's/^\.\///g'))
+            if [[ ${#mainRefs[@]} > 0 ]]
+            then
+              for ref in ${mainRefs[@]}; do
+                generateMainFiles ${ref}
+              done
+            fi
+            if [[ ${#includeRefs[@]} > 0 ]]
+            then
+              for ref in ${includeRefs[@]}; do
+                if [[ "$2" == *"$ref"* ]]
+                then
+                  output+="<li>$ref (Error: Circular reference found. Your build will fail.)</li>"
+                else
+                  chain=$2:${ref}
+                  generateIncludes ${ref} ${chain}
+                fi
+              done
+            fi
+            if [[ ${#includeRefs[@]} == 0 && ${#mainRefs[@]} == 0 ]]
+            then
+              output+="<li>Warning: include not used in any ${major_version} file or include</li>"
+            fi
+            output+="</ul>"
+          }
+
           for file in ${files[@]}; do
             # only create links for Markdown files that are not includes
-            if [[ $file == *.md ]] && [[ $file != _* ]]
+            if [[ $file == src/**/*.md ]] && [[ $file != src/*/_* ]]
             then
-              html_file=${file%.md}.html
-              file="<li><a href=\"https://deploy-preview-$pr_num--cockroachdb-docs.netlify.app/docs/$html_file\" target=\"_blank\" rel=\"noopener\">$file</a></li>"
-              output+="$file"
-            elif [[ $file == *.md ]] && [[ $file == _includes/releases/* ]]
+              generateMainFiles ${file/src\/.*?\//}
+            elif [[ $file == src/**/*.md ]] && [[ $file == src/*/_includes/releases/* ]]
             then
               OLDIFS=$IFS
               IFS='/'
               read -ra path <<< "$file"
               IFS=$OLDIFS
               major_version=${path[-2]}
-              file="<li><a href=\"https://deploy-preview-$pr_num--cockroachdb-docs.netlify.app/docs/releases/${major_version}.html\" target=\"_blank\" rel=\"noopener\">releases/${major_version}.md</a></li>"
-              [[ " ${output[*]} " != *"releases/${major_version}.md"* ]] && output+="$file"
-            elif [[ $file == _includes/v* && $file != *sidebar* ]] || [[ $file == _includes/cockroachcloud* && $file != *sidebar* ]]
+              file="<li>${file}:<ul><li><a href=\"https://deploy-preview-$pr_num--cockroachdb-docs.netlify.app/docs/releases/${major_version}.html\" target=\"_blank\" rel=\"noopener\">releases/${major_version}.md</a></li></ul></li>"
+              output+="$file"
+            elif [[ $file == src/*/_includes/v* || $file == src/*/_includes/cockroachcloud* || $file == src/*/images/* ]] && [[ $file != src/**/*.json ]] && [[ $file != *.gitignore* ]]
             then
-              output+="<li>${file}:</li><ul>"
-              OLDIFS=$IFS
-              IFS='/'
-              read -ra path <<< "$file"
-              IFS=$OLDIFS
-              major_version=${path[1]}
-              file_name=${path[-1]}
-              refs=($(grep -irl ${file_name} ${major_version}))
-              for ref in ${refs[@]}; do
-                html_file=${ref%.md}.html
-                file="<li><a href=\"https://deploy-preview-$pr_num--cockroachdb-docs.netlify.app/docs/$html_file\" target=\"_blank\" rel=\"noopener\">$ref</a></li>"
-                output+="$file"
-              done
-              output+="</ul>"
+              # file=$(echo ${file} | sed -E 's/src\/[^\/]*\///g')
+              generateIncludes ${file}
             else
               output+="<li>$file</li>"
             fi
           done;
           body="${output[@]}"
-          echo ::set-output name=body::$body
+          echo "body=$body" >> $GITHUB_ENV
 
       - name: Find Comment
-        uses: peter-evans/find-comment@v1
+        uses: peter-evans/find-comment@v2.0.1
         id: find-comment
         with:
           issue-number: ${{ github.event.pull_request.number }}
@@ -71,10 +108,10 @@ jobs:
           body-includes: Files changed
 
       - name: Create comment
-        uses: peter-evans/create-or-update-comment@v1
+        uses: peter-evans/create-or-update-comment@v2.1.0
         with:
           comment-id: ${{ steps.find-comment.outputs.comment-id }}
           issue-number: ${{ github.event.pull_request.number }}
           edit-mode: replace
           body: |
-            <h3>Files changed:</h3><ul>${{ steps.format.outputs.body }}</ul>
+            <h3>Files changed:</h3><ul>${{ env.body }}</ul>
